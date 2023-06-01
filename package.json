@@ -1,6 +1,6 @@
 {
-  "name": "ww-calendar",
-  "version": "3.3.1-rc1",
+  "name": "awe-calendar",
+  "version": "3.3.1",
   "scripts": {
     "build": "weweb build",
     "serve": "weweb serve"
