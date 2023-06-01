@@ -18,8 +18,8 @@ function getObjectPropertyPathOptions(basePropertyKey, { content }) {
 export default {
     editor: {
         label: {
-            en: 'Calendar',
-            fr: 'Calendrier',
+            en: 'Calendar (awe)',
+            fr: 'Calendrier (awe)',
         },
         customStylePropertiesOrder: [
             'defaultEventColor',
