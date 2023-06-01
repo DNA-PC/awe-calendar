@@ -96,6 +96,7 @@ export default {
                 { code: 'vi', label: 'Vietnamese' }
             ];
             const selectedLocale = localesList.find((supportedLocaleObj) => supportedLocaleObj.code === this.content.lang);
+            console.log('selectedLocale', selectedLocale)
 
             if (selectedLocale && selectedLocale.hasOwnProperty('code')) {
                 return selectedLocale.code;
