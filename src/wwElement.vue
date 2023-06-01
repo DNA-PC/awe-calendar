@@ -17,18 +17,19 @@
         :timeFrom="content.timeStart * 60"
         :timeTo="content.timeEnd * 60"
         :startWeekOnSunday="content.startWeekOnSunday"
+        :hideWeekdays="content.hideWeekdays"
+        :twelveHour="content.twelveHour"
+        :small="content.daySize === 'small'"
+        :xsmall="content.daySize === 'xsmall'"
         @event-click="handleEventClick"
         @cell-click="handleCellClick"
-        @view-change="currentView = $event.view"
+        @view-change="handleViewChange"
     />
 </template>
 
 <script>
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
-import 'vue-cal/dist/i18n/fr.js';
-import 'vue-cal/dist/i18n/es.js';
-import 'vue-cal/dist/i18n/de.js';
 
 export default {
     components: { VueCal },
@@ -43,8 +44,64 @@ export default {
         currentView: null,
     }),
     computed: {
+        /**
+         * Check if the selected language is supported.
+         * If so, use it. Otherwise, fallback to English.
+         *
+         * @returns {string|string}
+         */
         currentLang() {
-            return ['fr', 'es', 'de'].includes(this.content.lang) ? this.content.lang : 'en';
+            // See https://github.com/antoniandre/vue-cal/blob/b41fcee7909b11d0ed5234684171ae792312367b/src/documentation/index.vue#LL362C1-L404C2
+            const localesList = [
+                { code: 'sq', label: 'Albanian' },
+                { code: 'ar', label: 'Arabic' },
+                { code: 'bn', label: 'Bangla' },
+                { code: 'bs', label: 'Bosnian' },
+                { code: 'bg', label: 'Bulgarian' },
+                { code: 'ca', label: 'Catalan' },
+                { code: 'cs', label: 'Czech' },
+                { code: 'zh-cn', label: 'Chinese (Simplified)' },
+                { code: 'zh-hk', label: 'Chinese (Traditional)' },
+                { code: 'hr', label: 'Croatian' },
+                { code: 'da', label: 'Danish' },
+                { code: 'nl', label: 'Dutch' },
+                { code: 'en', label: 'English' },
+                { code: 'et', label: 'Estonian' },
+                { code: 'fa', label: 'Farsi' },
+                { code: 'fr', label: 'French' },
+                { code: 'ka', label: 'Georgian' },
+                { code: 'de', label: 'German' },
+                { code: 'el', label: 'Greek' },
+                { code: 'he', label: 'Hebrew' },
+                { code: 'hu', label: 'Hungarian' },
+                { code: 'is', label: 'Icelandic' },
+                { code: 'it', label: 'Italian' },
+                { code: 'id', label: 'Indonesian' },
+                { code: 'ja', label: 'Japanese' },
+                { code: 'ko', label: 'Korean' },
+                { code: 'lt', label: 'Lithuanian' },
+                { code: 'mn', label: 'Mongolian' },
+                { code: 'no', label: 'Norwegian' },
+                { code: 'pl', label: 'Polish' },
+                { code: 'pt-br', label: 'Portuguese Brasilian' },
+                { code: 'ro', label: 'Romanian' },
+                { code: 'ru', label: 'Russian' },
+                { code: 'sr', label: 'Serbian' },
+                { code: 'sk', label: 'Slovak' },
+                { code: 'sl', label: 'Slovenian' },
+                { code: 'es', label: 'Spanish' },
+                { code: 'sv', label: 'Swedish' },
+                { code: 'tr', label: 'Turkish' },
+                { code: 'uk', label: 'Ukrainian' },
+                { code: 'vi', label: 'Vietnamese' }
+            ];
+            const selectedLocale = localesList.find((supportedLocaleObj) => supportedLocaleObj.code === this.content.lang);
+
+            if (selectedLocale && selectedLocale.hasOwnProperty('code')) {
+                return selectedLocale.code;
+            } else {
+                return 'en';
+            }
         },
         customThemeStyle() {
             return {
@@ -132,7 +189,8 @@ export default {
                     content: wwLib.resolveObjectPropertyPath(event, this.content.eventContentPath || 'content') || '',
                     allDay: wwLib.resolveObjectPropertyPath(event, this.content.eventAllDayPath || 'allDay') || false,
                     split: wwLib.resolveObjectPropertyPath(event, this.content.eventCalendarPath || 'calendar') || null,
-                    calendar: wwLib.resolveObjectPropertyPath(event, this.content.eventCalendarPath || 'calendar') || null,
+                    calendar:
+                        wwLib.resolveObjectPropertyPath(event, this.content.eventCalendarPath || 'calendar') || null,
                     class: category ? category.class : 'calendar-default-event-color',
                 };
             });
@@ -203,6 +261,35 @@ export default {
                 name: 'cell:click',
                 event: {
                     cell: { date, calendar },
+                    currentView: this.currentView,
+                },
+            });
+        },
+
+        /**
+         * Triggers whenever the active view changes. (Day, Week, Month, etc.)
+         *
+         * TS definition:
+         *     EventReadyChanged {
+         *         view: string
+         *         startDate: Date // View start - JS native Date object.
+         *         endDate: Date, // View end - JS native Date object.
+         *         firstCellDate: Date // Month view only, in case cell is out of current month - JS native Date object.
+         *         lastCellDate: Date // Month view only, in case cell is out of current month - JS native Date object.
+         *         outOfScopeEvents: Array<Event> // Month view only, all the events that are out of the current month.
+         *         events: Array<Event> // All the events in the current view.
+         *         week: number // Week number. Only returned if view is 'week'.
+         *     }
+         *
+         * @param event
+         * @see https://antoniandre.github.io/vue-cal/#ex--emitted-events
+         * @see https://github.com/antoniandre/vue-cal/issues/168#issuecomment-739544326 TS types
+         */
+        handleViewChange(props = {}) {
+            this.$emit('trigger-event', {
+                name: 'view:change',
+                event: {
+                    ...props,
                     currentView: this.currentView,
                 },
             });

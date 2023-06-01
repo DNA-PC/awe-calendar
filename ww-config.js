@@ -1,13 +1,3 @@
-const langTooltip = `An array of objects:
-\`\`\`json
-[
-    { label: 'English', value: 'en' },
-    { label: 'French', value: 'fr' },
-    { label: 'Spanish', value: 'es' },
-    { label: 'German', value: 'de' },
-]
-\`\`\` `;
-
 function showObjectPropertyPath(basePropertyKey, { content, boundProps }) {
     return (
         boundProps[basePropertyKey] &&
@@ -15,6 +5,7 @@ function showObjectPropertyPath(basePropertyKey, { content, boundProps }) {
         typeof wwLib.wwCollection.getCollectionData(content[basePropertyKey])[0] === 'object'
     );
 }
+
 function getObjectPropertyPathOptions(basePropertyKey, { content }) {
     const data = wwLib.wwCollection.getCollectionData(content[basePropertyKey]);
     if (!data.length || typeof data[0] !== 'object') {
@@ -41,7 +32,10 @@ export default {
             'defaultView',
             ['enableYearsView', 'enableYearView', 'enableMonthView', 'enableWeekView', 'enableDayView'],
             'enableTimelessMode',
-            ['timestep', 'timeStart', 'timeEnd'],
+            ['timestep', 'timeStart', 'timeEnd'], // Steps control
+            ['startWeekOnSunday', 'twelveHour'], // I18n
+            ['hideWeekends', 'hideWeekdays'], // Hide days
+            'showAllDayEvents'
         ],
         customSettingsPropertiesOrder: [
             'lang',
@@ -90,6 +84,14 @@ export default {
                     date: new Date(),
                     calendar: null,
                 },
+                currentView: 'years | year | month | week | day',
+            },
+        },
+        {
+            name: 'view:change',
+            label: { en: 'On view change' },
+            event: {
+                // TODO Check, not sure what should be defined here, see handleViewChange
                 currentView: 'years | year | month | week | day',
             },
         },
@@ -355,6 +357,74 @@ export default {
             type: 'OnOff',
             defaultValue: false,
             bindable: true,
+        },
+        hideWeekdays: {
+            label: {
+                en: 'Hide particular days of the week',
+            },
+            type: 'Array',
+            defaultValue: [],
+            bindable: true,
+            options: {
+                item: {
+                    type: 'TextSelect',
+                    options: {
+                        options: [
+                            { label: 'Monday', value: 1 },
+                            { label: 'Tuesday', value: 2 },
+                            { label: 'Wednesday', value: 3 },
+                            { label: 'Thursday', value: 4 },
+                            { label: 'Friday', value: 5 },
+                            { label: 'Saturday', value: 6 },
+                            { label: 'Sunday', value: 7 },
+                        ],
+                    },
+                },
+            },
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'string',
+                tooltip:
+                    'Numbers from 1 to 7 for the day of the week, 7 is Sunday. Ex: `[6, 7]`',
+            },
+            /* wwEditor:end */
+            responsive: true,
+        },
+        twelveHour: {
+            label: {
+                en: 'Use 12h format',
+            },
+            type: 'OnOff',
+            defaultValue: false,
+            bindable: true,
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'boolean',
+                tooltip: 'A boolean that defines whether the option is applied: `true | false',
+            },
+            /* wwEditor:end */
+        },
+        daySize: {
+            label: {
+                en: 'Size of the day headings',
+            },
+            type: 'TextSelect',
+            options: {
+                options: [
+                    { label: 'Normal', value: null },
+                    { label: '3 characters', value: 'small' },
+                    { label: '1 character', value: 'xsmall' },
+                ],
+            },
+            defaultValue: null,
+            bindable: true,
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'string',
+                tooltip: 'A string that defines what option is applied: `null | small | xsmall',
+            },
+            /* wwEditor:end */
+            responsive: true,
         },
 
         calendars: {
@@ -666,8 +736,8 @@ export default {
             bindable: true,
             /* wwEditor:start */
             bindingValidation: {
-                type: 'array',
-                tooltip: langTooltip,
+                type: 'string',
+                tooltip: `The value that references the language. Example: "en", "fr". See https://antoniandre.github.io/vue-cal/#ex--internationalization for a full list of all supported languages.`,
             },
             /* wwEditor:end */
         },
