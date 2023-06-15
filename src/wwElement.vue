@@ -174,6 +174,9 @@ export default {
                     calendar:
                         wwLib.resolveObjectPropertyPath(event, this.content.eventCalendarPath || 'calendar') || null,
                     class: category ? category.class : 'calendar-default-event-color',
+                    background: wwLib.resolveObjectPropertyPath(event, this.content.eventBackgroundPath || 'background') || false,
+                    deletable: wwLib.resolveObjectPropertyPath(event, this.content.eventDeletablePath || 'deletable') || true,
+                    resizable: wwLib.resolveObjectPropertyPath(event, this.content.eventResizablePath || 'resizable') || true,
                 };
             });
             return events;
@@ -191,6 +194,9 @@ export default {
                     eventAllDayPath: null,
                     eventCalendarPath: null,
                     eventCategoryPath: null,
+                    eventBackgroundPath: null,
+                    eventDeletablePath: null,
+                    eventResizablePath: null,
                 });
         },
         'wwEditorState.boundProps.calendars'(isBind) {

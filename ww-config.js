@@ -53,6 +53,9 @@ export default {
                 'eventAllDayPath',
                 'eventCalendarPath',
                 'eventCategoryPath',
+                'eventBackgroundPath',
+                'eventDeletablePath',
+                'eventResizablePath',
             ],
         ],
     },
@@ -69,6 +72,9 @@ export default {
                     content: '',
                     calendar: null,
                     allDay: null,
+                    background: false,
+                    deletable: true,
+                    resizable: true,
                 },
                 currentView: 'years | year | month | week | day',
                 domEvent: {},
@@ -555,7 +561,16 @@ export default {
             options: {
                 item: {
                     type: 'Object',
-                    defaultValue: { startDate: null, endDate: null, title: null, content: null, calendar: null },
+                    defaultValue: {
+                        startDate: null,
+                        endDate: null,
+                        title: null,
+                        content: null,
+                        calendar: null,
+                        background: false,
+                        deletable: true,
+                        resizable: true,
+                    },
                     options: {
                         item: {
                             start: {
@@ -588,6 +603,18 @@ export default {
                                 label: { en: 'Category name' },
                                 type: 'Text',
                             },
+                            background: {
+                                label: { en: 'Is background event' },
+                                type: 'OnOff',
+                            },
+                            deletable: {
+                                label: { en: 'Is deletable' },
+                                type: 'OnOff',
+                            },
+                            resizable: {
+                                label: { en: 'Is resizable' },
+                                type: 'OnOff',
+                            },
                         },
                     },
                 },
@@ -601,6 +628,9 @@ export default {
                     content: 'Content of my first event',
                     calendar: null,
                     category: 'Sport',
+                    background: false,
+                    deletable: true,
+                    resizable: true,
                 },
                 {
                     // Add all day event yesterday
@@ -611,6 +641,9 @@ export default {
                     calendar: null,
                     category: 'Health',
                     allDay: true,
+                    background: false,
+                    deletable: true,
+                    resizable: true,
                 },
             ],
             /* wwEditor:start */
@@ -695,6 +728,39 @@ export default {
             type: 'ObjectPropertyPath',
             options: content => getObjectPropertyPathOptions('events', { content }),
             defaultValue: null,
+            section: 'settings',
+        },
+        eventBackgroundPath: {
+            hidden: (content, sidepanelContent, boundProps) =>
+                !showObjectPropertyPath('events', { content, boundProps }),
+            label: {
+                en: 'Background property',
+            },
+            type: 'ObjectPropertyPath',
+            options: content => getObjectPropertyPathOptions('events', { content }),
+            defaultValue: false,
+            section: 'settings',
+        },
+        eventDeletablePath: {
+            hidden: (content, sidepanelContent, boundProps) =>
+                !showObjectPropertyPath('events', { content, boundProps }),
+            label: {
+                en: 'Deletable property',
+            },
+            type: 'ObjectPropertyPath',
+            options: content => getObjectPropertyPathOptions('events', { content }),
+            defaultValue: true,
+            section: 'settings',
+        },
+        eventResizablePath: {
+            hidden: (content, sidepanelContent, boundProps) =>
+                !showObjectPropertyPath('events', { content, boundProps }),
+            label: {
+                en: 'Resizable property',
+            },
+            type: 'ObjectPropertyPath',
+            options: content => getObjectPropertyPathOptions('events', { content }),
+            defaultValue: true,
             section: 'settings',
         },
 
